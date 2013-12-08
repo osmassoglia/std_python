@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
+
 import MySQLdb as dbapi
- 
+
 
 class std_db:
     def __init__(self):
@@ -63,9 +64,11 @@ class std_db:
                     self.resources = False;
                     return False;            
                 
-            except:
-                print 'Execute get an error, Please check the SQL : %s ' % (query % self.db.literal(args));
-    ##            print 'Error %s %s %s' % (RuntimeError.value, TypeError, NameError)
+            except dbapi.Error, e:
+                #print 'Execute get an error, Please check the SQL : %s ' % (query);                
+                #print dbapi.Error
+                
+                print e
                 return False;
 
             

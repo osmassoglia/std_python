@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-
-from urllib2 import Request, urlopen, URLError
 import httplib2
+from urllib2 import Request, urlopen, URLError
 
 
 class std_http:

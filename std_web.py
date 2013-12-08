@@ -4,34 +4,63 @@ from urlparse import urlparse
 
 
 class std_web:
+    
+    
+    def __init__(self, main):
+        self.parent = main
+    
+    def parse_url(self, url):
+        schema = urlparse(url);
+        return schema
+    
     def get_all_links(self, url, data):
-        schemabase = urlparse(url);
-        protocol    = schemabase[0]
-        domain      = schemabase[1]
+        
+        protocol    = self.parent.protocol
+        domain      = self.parent.domain
         
         soup = BeautifulSoup(data)
         links = {}
         for link in soup.findAll("a"):
-            protocoli= protocol
-            domaini = domain
-            href = link.get('href')
-            schema = urlparse(href);
-            if schema[0]: 
-                protocoli = schema[0]
-                
-            if  schema[1]: 
-                domaini = schema[1]
-            
-            nhref = u'%s://%s%s' % (protocoli,domaini,schema[2])
-            #print nhref
-            tag = link.contents
-            if links.has_key(nhref):
-                links[href].append(tag)
-            else:
-                links.update({href:[]})
-                links[href].append(tag)
+            href = link.get('href')                 
+            info = self.process_url(href)
+            if info:
+                if len(link.contents):
+                    tag = link.contents[0]
+                    if links.has_key(info['realpath']):
+                        links[info['realpath']]['tags'].append(tag)
+                    else:
+                        links.update({info['realpath']:{'tags':[],'info':info}})
+                        links[info['realpath']]['tags'].append(tag)
         
         return links
+    
+    def process_url(self, url):        
+        protocol    = self.parent.protocol
+        domain      = self.parent.domain     
+        try:
+            schema = urlparse(url);
+            protocoli = protocol
+            if schema[0]: 
+                  protocoli = schema[0]
+                    
+            domaini = domain        
+            if  schema[1]: 
+                   domaini = schema[1]
+            path = "/";
+            if schema[2]:
+                   path =  schema[2]      
+            type=1
+            
+            if domain <> domaini:
+                type=2
+            
+            nhref = u'%s://%s%s' % (protocoli, domaini, path)
+            info = {'ptr': protocoli, 'dom': domaini, 'path': path,'type': type, 'realpath':nhref}
+            return info;            
+        except AttributeError:
+            print "error parsin ", AttributeError , " " ,url  
+            
+
             
     def get_all_headers(self, data):
         soup = BeautifulSoup(data)
